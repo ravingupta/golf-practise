@@ -1,6 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { database } from '../../database';
 import Shot from '../../model/Shot';
 
@@ -96,8 +97,16 @@ export default function HomeScreen() {
     <ScrollView style={{ flex: 1, backgroundColor: '#181c20' }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View>
         <View style={styles.headerContainer}>
-          <Text style={styles.golfTitle}>Golf Practice</Text>
-          <Text style={styles.golfSubtitle}>Track your progress</Text>
+          <View style={styles.headerContent}>
+            <Text style={styles.golfTitle}>Golf Practice</Text>
+            <Text style={styles.golfSubtitle}>Track your progress</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.helpButton}
+            onPress={() => router.push('/help')}
+          >
+            <MaterialCommunityIcons name="help-circle" size={28} color="#4caf50" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.statsContainer}>
@@ -165,10 +174,23 @@ export default function HomeScreen() {
 }
 const styles = StyleSheet.create({
   headerContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingTop: 60,
     paddingBottom: 16,
+    paddingHorizontal: 16,
     backgroundColor: '#181c20',
+  },
+  headerContent: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  helpButton: {
+    position: 'absolute',
+    right: 16,
+    top: 60,
+    padding: 8,
   },
   golfTitle: {
     fontSize: 28,

@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, FlatList, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { database } from '../../database';
@@ -98,8 +99,16 @@ export default function RecordScreen() {
       >
         <View>
           <View style={styles.headerContainer}>
-            <Text style={styles.golfTitle}>Record Shot</Text>
-            <Text style={styles.golfSubtitle}>Log your driving range shots</Text>
+            <View style={styles.headerContent}>
+              <Text style={styles.golfTitle}>Record Shot</Text>
+              <Text style={styles.golfSubtitle}>Log your driving range shots</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.helpButton}
+              onPress={() => router.push('/help')}
+            >
+              <MaterialCommunityIcons name="help-circle" size={28} color="#4caf50" />
+            </TouchableOpacity>
           </View>
           <View style={styles.card}>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
@@ -284,10 +293,23 @@ export default function RecordScreen() {
 
 const styles = StyleSheet.create({
   headerContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingTop: 60,
     paddingBottom: 16,
+    paddingHorizontal: 16,
     backgroundColor: '#181c20',
+  },
+  headerContent: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  helpButton: {
+    position: 'absolute',
+    right: 16,
+    top: 60,
+    padding: 8,
   },
   golfTitle: {
     fontSize: 28,
