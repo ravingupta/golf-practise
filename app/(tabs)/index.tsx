@@ -1,49 +1,61 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
 import { Image } from 'expo-image';
-import React, { useState } from 'react';
-import { Button, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { database } from '../../database';
 import Shot from '../../model/Shot';
 
+interface Session {
+  date: string;
+  shots: number;
+  avgDistance: number;
+}
 
 export default function HomeScreen() {
-  const [club, setClub] = useState('Driver');
-  const [direction, setDirection] = useState('Center');
-  const [expectation, setExpectation] = useState('Straight');
-  const [actual, setActual] = useState('Straight');
-  const [distance, setDistance] = useState('');
-  const [recentShots, setRecentShots] = useState<any[]>([]);
+  const [totalShots, setTotalShots] = useState(0);
+  const [avgDistance, setAvgDistance] = useState(0);
+  const [accuracy, setAccuracy] = useState(0);
+  const [recentSessions, setRecentSessions] = useState<Session[]>([]);
 
-  const handleSave = async () => {
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
     try {
-      const shotTime = Date.now();
-      let newShot;
-      await database.write(async () => {
-        newShot = await database.get<Shot>('shots').create((shot) => {
-          shot.club = club;
-          shot.direction = direction;
-          shot.expectation = expectation;
-          shot.actual = actual;
-          shot.distance = Number(distance);
-          shot.timestamp = shotTime;
-        });
+      const allShots = await database.get<Shot>('shots').query().fetch();
+      setTotalShots(allShots.length);
+
+      if (allShots.length > 0) {
+        const totalDist = allShots.reduce((sum, shot) => sum + shot.distance, 0);
+        setAvgDistance(Math.round(totalDist / allShots.length));
+
+        const accurateShots = allShots.filter(shot => shot.expectation === shot.actual).length;
+        setAccuracy(Math.round((accurateShots / allShots.length) * 100));
+      }
+
+      // Group by date for sessions
+      const sessionsMap = new Map<string, Shot[]>();
+      allShots.forEach(shot => {
+        const date = new Date(shot.timestamp).toDateString();
+        if (!sessionsMap.has(date)) {
+          sessionsMap.set(date, []);
+        }
+        sessionsMap.get(date)!.push(shot);
       });
-      setClub('Driver');
-      setDirection('Center');
-      setExpectation('Straight');
-      setActual('Straight');
-      setDistance('');
-      setRecentShots((prev) => [{
-        club,
-        direction,
-        expectation,
-        actual,
-        distance,
-        timestamp: shotTime,
-      }, ...prev].slice(0, 5));
+
+      const sessions: Session[] = Array.from(sessionsMap.entries())
+        .map(([date, shots]) => ({
+          date,
+          shots: shots.length,
+          avgDistance: Math.round(shots.reduce((sum, s) => sum + s.distance, 0) / shots.length),
+        }))
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 5);
+
+      setRecentSessions(sessions);
     } catch (e) {
-      alert('Error saving shot: ' + e);
+      console.error('Error loading stats:', e);
     }
   };
 
@@ -55,106 +67,43 @@ export default function HomeScreen() {
             source={require('@/assets/images/splash-icon.png')}
             style={styles.golfLogo}
           />
-          <Text style={styles.golfTitle}>Golf Range Practice</Text>
-          <Text style={styles.golfSubtitle}>Track your driving range shots</Text>
+          <Text style={styles.golfTitle}>Golf Practice</Text>
+          <Text style={styles.golfSubtitle}>Track your progress</Text>
         </View>
-        <View style={styles.card}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-            <MaterialCommunityIcons name="golf" size={28} color="#4caf50" style={{ marginRight: 8 }} />
-            <Text style={styles.cardTitle}>Record a Shot</Text>
+
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <MaterialCommunityIcons name="golf" size={32} color="#4caf50" />
+            <Text style={styles.statNumber}>{totalShots}</Text>
+            <Text style={styles.statLabel}>Total Shots</Text>
           </View>
-          <View style={{ gap: 12 }}>
-            <View style={styles.pickerContainer}>
-              <Text style={styles.pickerLabel}>Club</Text>
-              <Picker
-                selectedValue={club}
-                onValueChange={setClub}
-                style={styles.picker}
-                dropdownIconColor="#4caf50"
-              >
-                <Picker.Item label="Driver" value="Driver" />
-                <Picker.Item label="3 Wood" value="3 Wood" />
-                <Picker.Item label="5 Wood" value="5 Wood" />
-                <Picker.Item label="3 Iron" value="3 Iron" />
-                <Picker.Item label="4 Iron" value="4 Iron" />
-                <Picker.Item label="5 Iron" value="5 Iron" />
-                <Picker.Item label="6 Iron" value="6 Iron" />
-                <Picker.Item label="7 Iron" value="7 Iron" />
-                <Picker.Item label="8 Iron" value="8 Iron" />
-                <Picker.Item label="9 Iron" value="9 Iron" />
-                <Picker.Item label="PW" value="PW" />
-                <Picker.Item label="SW" value="SW" />
-                <Picker.Item label="Putter" value="Putter" />
-              </Picker>
-            </View>
-            <View style={styles.pickerContainer}>
-              <Text style={styles.pickerLabel}>Direction</Text>
-              <Picker
-                selectedValue={direction}
-                onValueChange={setDirection}
-                style={styles.picker}
-                dropdownIconColor="#4caf50"
-              >
-                <Picker.Item label="Left" value="Left" />
-                <Picker.Item label="Center" value="Center" />
-                <Picker.Item label="Right" value="Right" />
-                <Picker.Item label="High" value="High" />
-                <Picker.Item label="Low" value="Low" />
-              </Picker>
-            </View>
-            <View style={styles.pickerContainer}>
-              <Text style={styles.pickerLabel}>Expectation</Text>
-              <Picker
-                selectedValue={expectation}
-                onValueChange={setExpectation}
-                style={styles.picker}
-                dropdownIconColor="#4caf50"
-              >
-                <Picker.Item label="Straight" value="Straight" />
-                <Picker.Item label="Fade" value="Fade" />
-                <Picker.Item label="Draw" value="Draw" />
-                <Picker.Item label="Slice" value="Slice" />
-                <Picker.Item label="Hook" value="Hook" />
-              </Picker>
-            </View>
-            <View style={styles.pickerContainer}>
-              <Text style={styles.pickerLabel}>Actual</Text>
-              <Picker
-                selectedValue={actual}
-                onValueChange={setActual}
-                style={styles.picker}
-                dropdownIconColor="#4caf50"
-              >
-                <Picker.Item label="Straight" value="Straight" />
-                <Picker.Item label="Fade" value="Fade" />
-                <Picker.Item label="Draw" value="Draw" />
-                <Picker.Item label="Slice" value="Slice" />
-                <Picker.Item label="Hook" value="Hook" />
-              </Picker>
-            </View>
-            <TextInput
-              placeholder="Distance (yards/meters)"
-              placeholderTextColor="#888"
-              value={distance}
-              onChangeText={setDistance}
-              keyboardType="numeric"
-              style={styles.input}
-            />
-            <Button title="Record Shot" color="#4caf50" onPress={handleSave} />
+          <View style={styles.statCard}>
+            <MaterialCommunityIcons name="ruler" size={32} color="#4caf50" />
+            <Text style={styles.statNumber}>{avgDistance}</Text>
+            <Text style={styles.statLabel}>Avg Distance (yards)</Text>
+          </View>
+          <View style={styles.statCard}>
+            <MaterialCommunityIcons name="target" size={32} color="#4caf50" />
+            <Text style={styles.statNumber}>{accuracy}%</Text>
+            <Text style={styles.statLabel}>Accuracy</Text>
           </View>
         </View>
+
         <View style={styles.card}>
           <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
-            <MaterialCommunityIcons name="clipboard-list-outline" size={28} color="#4caf50" style={{ marginRight: 8 }} />
-            <Text style={styles.cardTitle}>Recent Shots</Text>
+            <MaterialCommunityIcons name="calendar" size={28} color="#4caf50" style={{ marginRight: 8 }} />
+            <Text style={styles.cardTitle}>Recent Sessions</Text>
           </View>
-          {recentShots.length === 0 ? (
-            <Text style={{ color: '#888', fontStyle: 'italic' }}>No shots recorded yet.</Text>
+          {recentSessions.length === 0 ? (
+            <Text style={{ color: '#888', fontStyle: 'italic' }}>No sessions yet. Start recording shots!</Text>
           ) : (
-            recentShots.map((shot, idx) => (
-              <View key={idx} style={styles.shotRow}>
-                <MaterialCommunityIcons name="golf" size={20} color="#4caf50" style={{ marginRight: 6 }} />
-                <Text style={styles.shotText}>{shot.club} | {shot.direction} | {shot.expectation} | {shot.actual} | {shot.distance}m | {new Date(shot.timestamp).toLocaleString()}</Text>
+            recentSessions.map((session, idx) => (
+              <View key={idx} style={styles.sessionRow}>
+                <MaterialCommunityIcons name="calendar" size={20} color="#4caf50" style={{ marginRight: 6 }} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.sessionDate}>{session.date}</Text>
+                  <Text style={styles.sessionStats}>{session.shots} shots • Avg: {session.avgDistance} yards</Text>
+                </View>
               </View>
             ))
           )}
@@ -187,6 +136,36 @@ const styles = StyleSheet.create({
     color: '#bbb',
     marginBottom: 8,
   },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginHorizontal: 16,
+    marginVertical: 12,
+  },
+  statCard: {
+    backgroundColor: '#23272b',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4caf50',
+    marginTop: 8,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#bbb',
+    marginTop: 4,
+  },
   card: {
     backgroundColor: '#23272b',
     borderRadius: 16,
@@ -204,38 +183,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#444',
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: '#181c20',
-    color: '#fff',
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  pickerContainer: {
-    marginBottom: 8,
-  },
-  pickerLabel: {
-    color: '#fff',
-    marginBottom: 4,
-    fontSize: 15,
-    fontWeight: 'bold',
-  },
-  picker: {
-    backgroundColor: '#23272b',
-    color: '#fff',
-    borderRadius: 8,
-    marginBottom: 4,
-  },
-  shotRow: {
+  sessionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 8,
   },
-  shotText: {
-    fontSize: 15,
+  sessionDate: {
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#fff',
+  },
+  sessionStats: {
+    fontSize: 14,
+    color: '#bbb',
   },
 });
