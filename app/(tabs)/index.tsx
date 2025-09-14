@@ -1,5 +1,4 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { database } from '../../database';
@@ -11,11 +10,19 @@ interface Session {
   avgDistance: number;
 }
 
+interface ClubStats {
+  club: string;
+  shots: number;
+  avgDistance: number;
+  accuracy: number;
+}
+
 export default function HomeScreen() {
   const [totalShots, setTotalShots] = useState(0);
   const [avgDistance, setAvgDistance] = useState(0);
   const [accuracy, setAccuracy] = useState(0);
   const [recentSessions, setRecentSessions] = useState<Session[]>([]);
+  const [clubStats, setClubStats] = useState<ClubStats[]>([]);
 
   useEffect(() => {
     loadStats();
@@ -54,6 +61,32 @@ export default function HomeScreen() {
         .slice(0, 5);
 
       setRecentSessions(sessions);
+
+      // Group by club for club analysis
+      const clubMap = new Map<string, Shot[]>();
+      allShots.forEach(shot => {
+        if (!clubMap.has(shot.club)) {
+          clubMap.set(shot.club, []);
+        }
+        clubMap.get(shot.club)!.push(shot);
+      });
+
+      const clubs: ClubStats[] = Array.from(clubMap.entries())
+        .map(([club, shots]) => {
+          const avgDist = Math.round(shots.reduce((sum, s) => sum + s.distance, 0) / shots.length);
+          const accurateShots = shots.filter(shot => shot.expectation === shot.actual).length;
+          const acc = Math.round((accurateShots / shots.length) * 100);
+          return {
+            club,
+            shots: shots.length,
+            avgDistance: avgDist,
+            accuracy: acc,
+          };
+        })
+        .sort((a, b) => b.shots - a.shots) // Sort by most used clubs first
+        .slice(0, 6); // Show top 6 clubs
+
+      setClubStats(clubs);
     } catch (e) {
       console.error('Error loading stats:', e);
     }
@@ -63,10 +96,6 @@ export default function HomeScreen() {
     <ScrollView style={{ flex: 1, backgroundColor: '#181c20' }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View>
         <View style={styles.headerContainer}>
-          <Image
-            source={require('@/assets/images/splash-icon.png')}
-            style={styles.golfLogo}
-          />
           <Text style={styles.golfTitle}>Golf Practice</Text>
           <Text style={styles.golfSubtitle}>Track your progress</Text>
         </View>
@@ -108,6 +137,28 @@ export default function HomeScreen() {
             ))
           )}
         </View>
+
+        <View style={styles.card}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <MaterialCommunityIcons name="golf" size={28} color="#4caf50" style={{ marginRight: 8 }} />
+            <Text style={styles.cardTitle}>Club Analysis</Text>
+          </View>
+          {clubStats.length === 0 ? (
+            <Text style={{ color: '#888', fontStyle: 'italic' }}>No club data yet. Start recording shots!</Text>
+          ) : (
+            clubStats.map((club, idx) => (
+              <View key={idx} style={styles.clubRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.clubName}>{club.club}</Text>
+                  <Text style={styles.clubStats}>{club.shots} shots • Avg: {club.avgDistance} yards • {club.accuracy}% accuracy</Text>
+                </View>
+                <View style={styles.clubAccuracy}>
+                  <Text style={styles.accuracyText}>{club.accuracy}%</Text>
+                </View>
+              </View>
+            ))
+          )}
+        </View>
       </View>
     </ScrollView>
   );
@@ -115,15 +166,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   headerContainer: {
     alignItems: 'center',
-    paddingTop: 32,
+    paddingTop: 60,
     paddingBottom: 16,
     backgroundColor: '#181c20',
-  },
-  golfLogo: {
-    width: 80,
-    height: 80,
-    marginBottom: 8,
-    tintColor: '#4caf50',
   },
   golfTitle: {
     fontSize: 28,
@@ -196,5 +241,37 @@ const styles = StyleSheet.create({
   sessionStats: {
     fontSize: 14,
     color: '#bbb',
+  },
+  clubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#181c20',
+    borderRadius: 8,
+  },
+  clubName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  clubStats: {
+    fontSize: 12,
+    color: '#bbb',
+    marginTop: 2,
+  },
+  clubAccuracy: {
+    backgroundColor: '#4caf50',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  accuracyText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });

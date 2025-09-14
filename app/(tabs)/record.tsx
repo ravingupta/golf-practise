@@ -1,5 +1,4 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import React, { useState } from 'react';
 import { Button, FlatList, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { database } from '../../database';
@@ -99,10 +98,6 @@ export default function RecordScreen() {
       >
         <View>
           <View style={styles.headerContainer}>
-            <Image
-              source={require('@/assets/images/splash-icon.png')}
-              style={styles.golfLogo}
-            />
             <Text style={styles.golfTitle}>Record Shot</Text>
             <Text style={styles.golfSubtitle}>Log your driving range shots</Text>
           </View>
@@ -290,15 +285,9 @@ export default function RecordScreen() {
 const styles = StyleSheet.create({
   headerContainer: {
     alignItems: 'center',
-    paddingTop: 32,
+    paddingTop: 60,
     paddingBottom: 16,
     backgroundColor: '#181c20',
-  },
-  golfLogo: {
-    width: 80,
-    height: 80,
-    marginBottom: 8,
-    tintColor: '#4caf50',
   },
   golfTitle: {
     fontSize: 28,
