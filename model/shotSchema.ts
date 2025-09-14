@@ -1,7 +1,7 @@
 import { appSchema, tableSchema } from '@nozbe/watermelondb';
 
 export const shotSchema = appSchema({
-  version: 3,
+  version: 4,
   tables: [
     tableSchema({
       name: 'shots',
@@ -19,6 +19,14 @@ export const shotSchema = appSchema({
         { name: 'wind', type: 'string' },
         { name: 'notes', type: 'string' },
         { name: 'timestamp', type: 'number' },
+        { name: 'mode', type: 'string' }, // 'driving_range' or 'golf_course'
+        { name: 'holeNumber', type: 'number' },
+        { name: 'par', type: 'number' },
+        { name: 'score', type: 'number' },
+        { name: 'pinPosition', type: 'string' },
+        { name: 'greenSpeed', type: 'string' },
+        { name: 'practiceType', type: 'string' },
+        { name: 'targetDistance', type: 'number' },
       ],
     }),
   ],

@@ -12,72 +12,88 @@ const golfTerms: TermItem[] = [
     definition: "The longest club in your bag, used for maximum distance off the tee."
   },
   {
+    term: "Fairway Woods (3W, 5W)",
+    definition: "Long clubs used for shots off the fairway or tee when less distance than a driver is needed."
+  },
+  {
+    term: "Irons (3-9 Iron)",
+    definition: "Clubs numbered 3 through 9, used for approach shots to the green. Lower numbers are longer clubs."
+  },
+  {
+    term: "Pitching Wedge (PW)",
+    definition: "A short iron used for approach shots and chips around the green."
+  },
+  {
+    term: "Sand Wedge (SW)",
+    definition: "Specialized club with a high loft, designed for shots from sand bunkers and high chips."
+  },
+  {
+    term: "Putter",
+    definition: "Club used for putting on the green to roll the ball into the hole."
+  },
+  {
     term: "Fairway",
-    definition: "The closely mowed area between the tee and the green."
+    definition: "Well-maintained grass area between the tee and green where shots are intended to land."
   },
   {
     term: "Rough",
-    definition: "The longer grass area bordering the fairway."
+    definition: "Longer grass bordering the fairway that makes shots more difficult."
   },
   {
-    term: "Green",
-    definition: "The specially prepared area with short grass around the hole."
+    term: "Sand Bunker",
+    definition: "Hazard filled with sand that requires special technique to escape."
   },
   {
-    term: "Sand Trap/Bunker",
-    definition: "A hazard filled with sand that makes shots more difficult."
-  },
-  {
-    term: "Lie",
-    definition: "The position or condition of your golf ball on the ground."
-  },
-  {
-    term: "Carry",
-    definition: "The distance the ball travels through the air before first contact with the ground."
-  },
-  {
-    term: "Total Distance",
-    definition: "The total distance from where you hit the ball to where it comes to rest."
-  },
-  {
-    term: "Draw",
-    definition: "A shot that curves slightly to the left (for right-handed golfers)."
-  },
-  {
-    term: "Fade",
-    definition: "A shot that curves slightly to the right (for right-handed golfers)."
-  },
-  {
-    term: "Slice",
-    definition: "A shot that curves sharply to the right (for right-handed golfers)."
-  },
-  {
-    term: "Hook",
-    definition: "A shot that curves sharply to the left (for right-handed golfers)."
-  },
-  {
-    term: "Straight",
-    definition: "A shot that flies directly toward the target without curving."
-  },
-  {
-    term: "Accuracy",
-    definition: "How close your shots come to your intended target."
-  },
-  {
-    term: "Lateral Direction",
-    definition: "Whether the shot goes left, center, or right of the target."
-  },
-  {
-    term: "Inclination",
-    definition: "Whether the shot goes low, center, or high relative to the target."
+    term: "Tee Box",
+    definition: "Starting area for each hole where the first shot is played."
   },
   {
     term: "Wind Conditions",
-    definition: "Weather conditions that can affect ball flight (head wind, tail wind, cross wind)."
+    definition: "Weather factors affecting ball flight: Head wind (against you), Tail wind (with you), Cross wind (sideways)."
+  },
+  {
+    term: "Lateral Direction",
+    definition: "Horizontal ball flight: Left (missed target left), Center (on target), Right (missed target right)."
+  },
+  {
+    term: "Inclination",
+    definition: "Vertical ball flight: Low (ball stayed low), Center (normal trajectory), High (ball went high)."
+  },
+  {
+    term: "Shot Shape - Straight",
+    definition: "Ball flies directly toward the target without curving."
+  },
+  {
+    term: "Shot Shape - Fade",
+    definition: "Ball curves slightly right-to-left (for right-handed golfers)."
+  },
+  {
+    term: "Shot Shape - Draw",
+    definition: "Ball curves slightly left-to-right (for right-handed golfers)."
+  },
+  {
+    term: "Shot Shape - Slice",
+    definition: "Ball curves sharply right-to-left, often unwanted."
+  },
+  {
+    term: "Shot Shape - Hook",
+    definition: "Ball curves sharply left-to-right, often unwanted."
+  },
+  {
+    term: "Carry Distance",
+    definition: "Distance the ball travels through the air before first ground contact."
+  },
+  {
+    term: "Total Distance",
+    definition: "Complete distance from shot start to where ball comes to rest."
+  },
+  {
+    term: "Accuracy",
+    definition: "Percentage of shots that match your intended outcome."
   },
   {
     term: "Expectation vs Actual",
-    definition: "What you expected the shot to do versus what actually happened."
+    definition: "Comparison between what you expected the shot to do versus what actually happened."
   }
 ];
 

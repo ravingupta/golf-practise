@@ -17,4 +17,12 @@ export default class Shot extends Model {
   @field('wind') wind!: string;
   @field('notes') notes!: string;
   @field('timestamp') timestamp!: number;
+  @field('mode') mode!: string;
+  @field('holeNumber') holeNumber!: number;
+  @field('par') par!: number;
+  @field('score') score!: number;
+  @field('pinPosition') pinPosition!: string;
+  @field('greenSpeed') greenSpeed!: string;
+  @field('practiceType') practiceType!: string;
+  @field('targetDistance') targetDistance!: number;
 }
