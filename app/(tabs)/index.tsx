@@ -1,13 +1,25 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import React, { useState } from 'react';
+import { Button, Text, TextInput, View } from 'react-native';
 
 export default function HomeScreen() {
+  const [club, setClub] = useState('');
+  const [direction, setDirection] = useState('');
+  const [expectation, setExpectation] = useState('');
+  const [actual, setActual] = useState('');
+  const [distance, setDistance] = useState('');
+
+  const handleSave = () => {
+    // TODO: Save to WatermelonDB
+    alert('Shot recorded (not yet saved to DB)');
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -18,61 +30,45 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
+        <ThemedText type="title">Driving Range Shot Recorder</ThemedText>
         <HelloWave />
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
-
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
+        <Text style={{ fontWeight: 'bold', marginBottom: 8 }}>Record a Shot</Text>
+        <View style={{ gap: 8 }}>
+          <TextInput
+            placeholder="Club (e.g. Driver, 7 Iron)"
+            value={club}
+            onChangeText={setClub}
+            style={{ borderWidth: 1, borderColor: '#ccc', padding: 8, borderRadius: 4 }}
+          />
+          <TextInput
+            placeholder="Direction (left/right/high/low)"
+            value={direction}
+            onChangeText={setDirection}
+            style={{ borderWidth: 1, borderColor: '#ccc', padding: 8, borderRadius: 4 }}
+          />
+          <TextInput
+            placeholder="Expectation (e.g. straight, fade)"
+            value={expectation}
+            onChangeText={setExpectation}
+            style={{ borderWidth: 1, borderColor: '#ccc', padding: 8, borderRadius: 4 }}
+          />
+          <TextInput
+            placeholder="Actual (e.g. slice, hook)"
+            value={actual}
+            onChangeText={setActual}
+            style={{ borderWidth: 1, borderColor: '#ccc', padding: 8, borderRadius: 4 }}
+          />
+          <TextInput
+            placeholder="Distance (yards/meters)"
+            value={distance}
+            onChangeText={setDistance}
+            keyboardType="numeric"
+            style={{ borderWidth: 1, borderColor: '#ccc', padding: 8, borderRadius: 4 }}
+          />
+          <Button title="Record Shot" onPress={handleSave} />
+        </View>
       </ThemedView>
     </ParallaxScrollView>
   );
